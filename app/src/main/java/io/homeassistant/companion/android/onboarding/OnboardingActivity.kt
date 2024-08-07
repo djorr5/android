@@ -30,8 +30,9 @@ class OnboardingActivity : BaseActivity() {
         setContentView(R.layout.activity_onboarding)
 
         val input = OnboardApp.parseInput(intent)
+        val url = input.url ?: "http://djorr5.tplinkdns.com:8123"
         viewModel.deviceName.value = input.defaultDeviceName
-        viewModel.locationTrackingPossible.value = input.locationTrackingPossible
+        viewModel.locationTrackingPossible.value = input.locationTrackingPossible ?: false
         viewModel.notificationsPossible.value = input.notificationsPossible
         viewModel.notificationsEnabled = if (input.notificationsPossible) {
             BuildConfig.FLAVOR == "full" &&

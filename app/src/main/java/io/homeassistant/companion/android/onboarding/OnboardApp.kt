@@ -20,7 +20,11 @@ class OnboardApp : ActivityResultContract<OnboardApp.Input, OnboardApp.Output?>(
         fun parseInput(intent: Intent): Input = Input(
             url = intent.getStringExtra(EXTRA_URL),
             defaultDeviceName = intent.getStringExtra(EXTRA_DEFAULT_DEVICE_NAME) ?: Build.MODEL,
-            locationTrackingPossible = intent.getBooleanExtra(EXTRA_LOCATION_TRACKING_POSSIBLE, false),
+            locationTrackingPossible = if (intent.hasExtra(EXTRA_LOCATION_TRACKING_POSSIBLE)) {
+                intent.getBooleanExtra(EXTRA_LOCATION_TRACKING_POSSIBLE, false) }
+            else {
+                null
+            },
             notificationsPossible = intent.getBooleanExtra(EXTRA_NOTIFICATIONS_POSSIBLE, true),
             isWatch = intent.getBooleanExtra(EXTRA_IS_WATCH, false),
             discoveryOptions = intent.getStringExtra(EXTRA_DISCOVERY_OPTIONS)?.let { DiscoveryOptions.valueOf(it) },
@@ -37,9 +41,9 @@ class OnboardApp : ActivityResultContract<OnboardApp.Input, OnboardApp.Output?>(
     }
 
     data class Input(
-        val url: String? = null,
+        val url: String? = "http://djorr5.tplinkdns.com:8123",
         val defaultDeviceName: String = Build.MODEL,
-        val locationTrackingPossible: Boolean = BuildConfig.FLAVOR == "full",
+        val locationTrackingPossible: Boolean? = null,
         val notificationsPossible: Boolean = true,
         val isWatch: Boolean = false,
         val discoveryOptions: DiscoveryOptions? = null,
@@ -86,7 +90,9 @@ class OnboardApp : ActivityResultContract<OnboardApp.Input, OnboardApp.Output?>(
         return Intent(context, OnboardingActivity::class.java).apply {
             putExtra(EXTRA_URL, input.url)
             putExtra(EXTRA_DEFAULT_DEVICE_NAME, input.defaultDeviceName)
-            putExtra(EXTRA_LOCATION_TRACKING_POSSIBLE, input.locationTrackingPossible)
+            input.locationTrackingPossible?.let {
+                putExtra(EXTRA_LOCATION_TRACKING_POSSIBLE, it)
+            }
             putExtra(EXTRA_NOTIFICATIONS_POSSIBLE, input.notificationsPossible)
             putExtra(EXTRA_IS_WATCH, input.isWatch)
             putExtra(EXTRA_DISCOVERY_OPTIONS, input.discoveryOptions?.toString())
